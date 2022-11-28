@@ -1,7 +1,9 @@
 # Deep lense for OCaml records
 
-A ppx rewriter providing easy overrides of deeply nested record
+A ppx rewriter provides a leaner syntax foor deeply nested record
 fields.
+
+Consider the following example dataset:
 
 ```ocaml
 type point = { x : int; y : int }
@@ -12,9 +14,21 @@ let game = {
   player_a = { name = "Alice"; position = { x = 0; y = 0 } };
   player_b = { name = "Bob"; position = { x = 10; y = 10 } };
 }
+```
 
-(* Overriding game.player_a.position.x *)
+## Pattern-matching nested fields
 
+```ocaml
+(* Plain OCaml *)
+let { player_a = { position = { x; _}; _ }; _ } = game
+
+(* With deep-lense *)
+let [%deep_lense? { Player_a.Position.x }] = game
+```
+
+## Overriding nested fields
+
+```ocaml
 (* Plain OCaml *)
 let _ = {
   game with player_a = {
@@ -27,6 +41,8 @@ let _ = {
 (* With deep-lense *)
 let _ = [%deep_lense { game with Player_a.Position.x = 1 }]
 ```
+
+# Syntax choice
 
 Nested field are capitalized since `{ game with player_a.position.x =
 1 }` is not syntactically valid. Qualifying fields with module names
