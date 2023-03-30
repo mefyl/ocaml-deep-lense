@@ -7,6 +7,10 @@
  (action
   (with-stdout-to
    %{target}
-   (run %{dep:.logistic/dune/extdeps/extdeps.exe} generate))))
+   (run
+    %{dep:.logistic/dune/extdeps/extdeps.exe}
+    generate
+    --cross-both
+    ppxlib))))
 
 (include dune.inc)

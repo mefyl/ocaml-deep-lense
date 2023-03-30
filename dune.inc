@@ -9,8 +9,8 @@
  (action
   (with-stdout-to %{target}
    (run %{dep:.logistic/dune/extdeps/extdeps.exe} rewrite-ios --input
-    %{dep:deep-lense.opam} --cross deep-lense --cross-both "" --cross-exclude
-    ""))))
+    %{dep:deep-lense.opam} --cross deep-lense --cross-both ppxlib
+    --cross-exclude ""))))
 (rule (target deep-lense-ios.%{version:deep-lense}.opam)
  (deps (:opam deep-lense-ios.opam))
  (action
