@@ -1,0 +1,12 @@
+(dirs :standard .logistic)
+
+(rule
+ (target dune.inc)
+ (alias extdeps)
+ (mode (promote))
+ (action
+  (with-stdout-to
+   %{target}
+   (run %{dep:.logistic/dune/extdeps/extdeps.exe} generate))))
+
+(include dune.inc)
