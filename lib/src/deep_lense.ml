@@ -1,9 +1,15 @@
 open Ppxlib
 module Fields = Map.Make (String)
 
-type 'ast node = Value of 'ast | Values of 'ast node Fields.t
+type 'ast node =
+  | Value of 'ast
+  | Values of 'ast node Fields.t
 
-exception Error of { loc : location; message : string }
+exception
+  Error of {
+    loc : location;
+    message : string;
+  }
 
 let pp_fields =
   let open Format in
@@ -15,42 +21,42 @@ let node_of_fields fields =
       | Lident name -> String.uncapitalize_ascii name :: acc
       | Ldot (id, name) -> path (String.uncapitalize_ascii name :: acc) id
       | Lapply _ ->
-          raise
-            (Error { loc = id.loc; message = "unexpected functor application" })
+        raise
+          (Error { loc = id.loc; message = "unexpected functor application" })
     in
     let path = path [] id.txt in
     let rec insert ctx fields = function
       | [] -> failwith "impossible empty path"
       | [ field ] ->
-          let update = function
-            | None -> Some (Value value)
-            | Some _ ->
-                raise
-                  (Error
-                     {
-                       loc = id.loc;
-                       message =
-                         Format.asprintf "duplicate field %a" pp_fields
-                           (List.rev (field :: ctx));
-                     })
-          in
-          Fields.update field update fields
+        let update = function
+          | None -> Some (Value value)
+          | Some _ ->
+            raise
+              (Error
+                 {
+                   loc = id.loc;
+                   message =
+                     Format.asprintf "duplicate field %a" pp_fields
+                       (List.rev (field :: ctx));
+                 })
+        in
+        Fields.update field update fields
       | head :: tail ->
-          let ctx = head :: ctx in
-          let update = function
-            | None -> Some (Values (insert ctx Fields.empty tail))
-            | Some (Values values) -> Some (Values (insert ctx values tail))
-            | Some (Value _) ->
-                raise
-                  (Error
-                     {
-                       loc = id.loc;
-                       message =
-                         Format.asprintf "duplicate field %a" pp_fields
-                           (List.rev ctx);
-                     })
-          in
-          Fields.update head update fields
+        let ctx = head :: ctx in
+        let update = function
+          | None -> Some (Values (insert ctx Fields.empty tail))
+          | Some (Values values) -> Some (Values (insert ctx values tail))
+          | Some (Value _) ->
+            raise
+              (Error
+                 {
+                   loc = id.loc;
+                   message =
+                     Format.asprintf "duplicate field %a" pp_fields
+                       (List.rev ctx);
+                 })
+        in
+        Fields.update head update fields
     in
     insert [] fields path
   in
@@ -69,8 +75,8 @@ let expression =
           match value with
           | Value v -> (id, v) :: acc
           | Values v ->
-              let ctx = Ast.pexp_field ctx id in
-              ({ loc; txt = Lident name }, to_record ctx v) :: acc
+            let ctx = Ast.pexp_field ctx id in
+            ({ loc; txt = Lident name }, to_record ctx v) :: acc
         in
         Fields.fold fold fields []
       and to_record ctx v = Ast.pexp_record (to_fields ctx v) (Some ctx) in

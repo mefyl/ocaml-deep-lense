@@ -1,5 +1,13 @@
-type point = { x : int; y : int }
-and player = { name : string; position : point } [@@deriving eq, show]
+type point = {
+  x : int;
+  y : int;
+}
+
+and player = {
+  name : string;
+  position : point;
+}
+[@@deriving eq, show]
 
 let player = Alcotest.testable pp_player equal_player
 let alice = { name = "Alice"; position = { x = 0; y = 0 } }
@@ -36,14 +44,15 @@ module Pattern = struct
   let guard () =
     match alice with
     | [%deep_lense? { Position.x; Position.y }] when x > y ->
-        Alcotest.fail "pattern guard failed"
+      Alcotest.fail "pattern guard failed"
     | [%deep_lense? { Position.x; Position.y }] when x = y -> ()
     | _ -> Alcotest.fail "pattern guard failed"
 end
 
 (* let _ = [%deep_lense { alice with Position.x = 0; Position.x = 0 }] *)
 
-(* let _ = [%deep_lense { alice with position = { x = 0; y = 0 }; Position.x = 0 }] *)
+(* let _ = [%deep_lense { alice with position = { x = 0; y = 0 }; Position.x = 0
+   }] *)
 
 let () =
   let open Alcotest in
