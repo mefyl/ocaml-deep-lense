@@ -8,10 +8,9 @@ license: "LGPL-3.0-or-later"
 homepage: "https://github.com/mefyl/ocaml-deep-lense"
 bug-reports: "https://github.com/mefyl/ocaml-deep-lense/issues"
 depends: [
-  "ocamlformat" {= "0.24.1"}
+  "ocamlformat" {= "0.26.1"}
   "opam-file-format"
   "sexplib"
-  "shexp"
   "alcotest" {= "1.7.0" & with-test}
   "astring" {= "0.8.5" & with-test}
   "base-bigarray" {= "base"}
